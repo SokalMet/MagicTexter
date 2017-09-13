@@ -1,0 +1,105 @@
+﻿@model MagicTexter.Models.Entities.Home
+@{
+    ViewBag.Title = "Home Page";
+    //var allItemMappings = Model.ItemMappings;
+    var allItems = Model.Items;
+}
+<div class="modal fade" id="create-modal" tabindex="-1" role="dialog" data-keyboard="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Choose your template:</h4>
+            </div>
+            <div class="modal-body">
+                <p>@Html.DropDownList("TemplateName", Model.TemplateList ,new { @class = "form-control" })</p>
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" name="TemplateId" id="templateId" value=""/>
+                <button type="button" class="btn btn-primary" id="selectTemplate">Select</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="row">
+    <div class="jumbotron col-md-8">
+        <h2>Magic Texter</h2>
+        <h3><span class="selectedTemplateName"></span><span class="enteredName"></span> </h3>
+        <div class="row">
+            <textarea class='form-control' style="resize: vertical; line-height: 16px; height: 190px; max-width: 100%" id="textArea">Test</textarea>
+        </div>
+    </div>
+
+    <div class="col-md-4" style="padding-top:5%; padding-left: 5%">
+        <div class="form-horizontal">
+            <div class="form-group">
+                Enter name:
+                @Html.EditorFor(model => model.HomeName, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+            <div class="form-group">
+                Selected language:
+                <input type="hidden" name="LanguageId" id="languageId" value="" />
+                @Html.DropDownList("LanguageName", Model.LanguageList, new { @class = "form-control" })
+            </div>
+            <div class="form-group" id="itemSelect">
+            </div>
+        </div>
+     </div>
+</div>
+
+
+@section Scripts {
+    <script type="text/javascript">
+        var selectedTemplateName = $('#TemplateName').val()
+        var selectedLanguageName = $('#LanguageName').val()
+        var allTemplates = []
+        var allLanguages = []
+
+        @foreach (var element in Model.Templates) {
+            @:allTemplates.push({ Id: "@element.Id", Name: "@element.Name", Items: "@element.Items" });
+        };
+
+        @foreach (var element in Model.Languages) {
+            @:allLanguages.push({ Id: "@element.Id", Name: "@element.Name" });
+        };
+
+        $(document).ready(function () {
+            $("#templateId").attr("value", @Model.Templates.FirstOrDefault().Id);
+            $("#languageId").attr("value", @Model.Languages.FirstOrDefault().Id);
+            $('#create-modal').modal('show');
+        });
+
+        $("#LanguageName").on("change", function () {
+            selectedLanguageName = $('#LanguageName').val()
+            var resLang = $.grep(allLanguages, function (el) {
+                return el.Name == selectedLanguageName;
+            });
+            $("#languageId").attr("value", resLang[0]["Id"]);
+            $(function () {
+                $('#itemSelect').load("/Home/GetIndexes", { templateId: $("#templateId").attr("value"), languageId: $("#languageId").attr("value") });
+            });
+        });
+        $("#TemplateName").on("change", function () {
+            selectedTemplateName = $('#TemplateName').val()
+            var resTempl = $.grep(allTemplates, function (el) {
+                return el.Name == selectedTemplateName;
+            });
+            $("#templateId").attr("value", resTempl[0]["Id"]);
+        });
+
+        $("#HomeName").on("change", function () {
+            $(document).find("span.enteredName").html("");
+            $(document).find("span.enteredName").html(": "+$("#HomeName").val());
+        });
+
+        $("#selectTemplate").click(function () {            
+            $(function () {       
+                $('#itemSelect').load("/Home/GetIndexes", { templateId: $("#templateId").attr("value"), languageId: $("#languageId").attr("value") });
+            });
+            $("#create-modal").modal('hide');
+            $(document).find("span.selectedTemplateName").html(selectedTemplateName);
+        });
+        
+    </script>
+}

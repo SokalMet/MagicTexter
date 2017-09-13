@@ -1,0 +1,39 @@
+﻿@model  MagicTexter.Models.Entities.PartialIndexesModel
+@{
+   
+}
+<label>Select items:</label>
+@foreach (var itemMapping in Model.ItemMappings)
+{
+    var item = Model.Items.FirstOrDefault(x => x.Id == itemMapping.ItemId);
+    <div class="funkyradio">
+        <div class="funkyradio-success">
+            <input type="checkbox" name="checkbox" data-item-id="@item.Id"
+                data-item-description="@item.TextItems.FirstOrDefault(x=>x.LanguageId == Model.Language.Id).Text" id="checkbox-@item.Id" />
+            <label for="checkbox-@item.Id" style="margin-top:10px">
+                @item.Name
+                @if (item.HasValue == true)
+            {
+                    <input type="text" id="value-@item.Id" placeholder="Enter value" class="form-control" style="max-width:90%; margin-left:10%" />
+            }
+            </label>
+        </div>
+    </div>
+}
+<button type="button" class="btn btn-primary" id="generate" style="margin-top:20px">Generate</button>
+
+<script> 
+    var valueForReplace = "%value%";
+    $("#generate").on("click", function () {
+        var textAreaText = $("#textArea").html("");
+        $(".funkyradio-success").each(function () {
+            var itemId = $(this).find("input[type='checkbox']:checked").data("item-id"); 
+            if (itemId) {
+                var description = $(this).find("input[type='checkbox']:checked").data("item-description");
+                var value = $("#value-" + itemId).val();
+                    description = description.replace(valueForReplace, value)
+                    textAreaText.append(description + "\n\n") 
+            }            
+        });
+    });
+</script>

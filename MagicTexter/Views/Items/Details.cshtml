@@ -1,0 +1,45 @@
+﻿@model MagicTexter.Models.Entities.Item
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Details</h2>
+<div>
+    <h4>@Model.Name</h4>
+    <hr />
+    <table class="table table-bordered table-striped">
+        <tr>
+            <th>
+                Language
+            </th>
+            <th>
+                Text item translation
+            </th>
+            <th>
+                Has Value
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model.Languages)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ShortName)
+                </td>
+                <td>
+                    @Html.EditorFor(modelItem => Model.TextItems.FirstOrDefault(x => x.LanguageId == item.Id).Text)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => model.HasValue)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) 
+                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                </td>
+            </tr>
+        }
+    </table>
+</div>

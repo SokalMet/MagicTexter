@@ -1,0 +1,86 @@
+﻿@model MagicTexter.Models.Entities.Item
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var counter = 0;
+}
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(model => model.Id)
+    <div>
+        <h3><b>Edit item :</b></h3>
+        <ul class="nav nav-tabs">
+            <li><b>@Model.Name</b></li>
+            <li class="pull-right"><button class="btn btn-success" id="nextToSave" type="submit">Save</button></li>
+        </ul>
+    </div>
+
+    <div class="form-horizontal" style="padding-top:2%">
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-md-2 control-label">Text item </label>
+            <div class="col-md-6">
+                <table class="table table-bordered table-striped">
+                    <tr>
+                        <th>
+                            Language
+                        </th>
+                        <th>
+                            Text item translation
+                        </th>
+                    </tr>
+
+                    @foreach (var item in Model.Languages)
+                    {
+                            var textItem = Model.TextItems.FirstOrDefault(x => x.LanguageId == item.Id);
+                         
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => textItem.Language.ShortName, new { htmlAttributes = new { Name = "Languages[" + (counter) + "].LanguegeId", @class = "form-control" } })
+                            </td>
+                            <td>
+                                <input type="hidden" name=@Html.Raw("TextItems[" + counter +"].Id") value="@textItem.Id" />
+                                <input type="hidden" name=@Html.Raw("TextItems[" + counter +"].ItemId") value="@Model.Id" />
+                                <input type="hidden" name=@Html.Raw("TextItems[" + counter +"].LanguageId") value="@item.Id" />
+                                @Html.EditorFor(modelItem => textItem.Text, new { htmlAttributes = new { Name = "TextItems[" + (counter++) +"].Text", id= "Text-[" + item.Id + "]" , @class = "form-control" } })
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+            <div class="col-md-4">
+                <textarea class='form-control' style="resize: vertical; line-height: 16px; height: 80px; max-width: 100%" id="textArea">Example :</textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.HasValue, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <div class="checkbox" style="margin-left: 20px">
+                    @Html.EditorFor(model => model.HasValue)
+                    @Html.ValidationMessageFor(model => model.HasValue, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+        $("#textArea").append("\n\nThis is [nice; cool; good; great] place to have fun for %value% hours a day!")
+    </script>
+}
